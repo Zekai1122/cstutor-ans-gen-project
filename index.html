@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompt Q&A Platform</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Prompt Q&A Demo</h1>
+    <p>Enter your question below:</p>
+
+    <textarea id="question" placeholder="e.g., How are large language models trained?"></textarea>
+    <button id="submit">Submit Question</button>
+
+    <div id="answer" class="answer-box"></div>
+  </div>
+
+  <script>
+    document.getElementById("submit").addEventListener("click", async () => {
+      const question = document.getElementById("question").value;
+      const answerBox = document.getElementById("answer");
+      answerBox.innerText = "Thinking...";
+
+      const messages = [
+        { role: "system", content: "Always start your answer with: 'Hello student.'" },
+        { role: "user", content: question }
+      ];
+
+      try {
+        const response = await fetch("https://cstutor-ans-gen-project-api.onrender.com/ask", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ messages })
+        });
+
+        const data = await response.json();
+        const reply = data.reply || "Failed to get a response.";
+        answerBox.innerText = reply;
+      } catch (error) {
+        answerBox.innerText = "Error: " + error.message;
+      }
+    });
+  </script>
+</body>
+</html>
