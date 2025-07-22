@@ -21,7 +21,6 @@
   </div>
 
   <script>
-    // const API_URL = "https://cstutor-ans-gen-project-api.onrender.com/ask";
     const API_URL = "https://ai4csedu.pythonanywhere.com/ask";
     const chatHistoryEl = document.getElementById("chat-history");
     const input = document.getElementById("question");
@@ -68,13 +67,19 @@
           body: JSON.stringify({ messages })
         });
 
+        if (res.status === 429) {
+          chatHistoryEl.lastChild.remove(); // rm "Thinking..."
+          appendMessage("assistant", "Thanks for trying out our demo! 😊 You've reached the free daily limit of 5 questions. This Q&A system is designed to showcase how educational answers can be more accurate, clear, and supportive — we really appreciate your interest in exploring that!");
+          return;
+        }
+
         const data = await res.json();
-        chatHistoryEl.lastChild.remove();
+        chatHistoryEl.lastChild.remove(); // rm "Thinking..."
         const reply = data.reply || "Sorry, something went wrong.";
         messages.push({ role: "assistant", content: reply });
         appendMessage("assistant", reply);
       } catch (err) {
-        chatHistoryEl.lastChild.remove();
+        chatHistoryEl.lastChild.remove(); // rm "Thinking..."
         appendMessage("assistant", "Error: " + err.message);
       } finally {
         isSending = false;
